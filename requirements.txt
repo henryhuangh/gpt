@@ -1,0 +1,7 @@
+torch
+accelerate
+llama_index
+PyPDF2
+protobuf==3.20.1
+sentence_transformers
+bitsandbytes
