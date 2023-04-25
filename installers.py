@@ -2,8 +2,6 @@ import os
 from sys import platform
 
 if platform == "linux" or platform == "linux2":
-    os.system("sudo yum install git")
-    os.system("git clone *")
     os.system("mkdir vicuna-7B")
     os.system("aws s3 cp s3://llm-models-0/vicuna-7B/ ./vicuna-7B --recursive")
 elif platform == "win32":
