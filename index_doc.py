@@ -6,7 +6,6 @@ from llama_index import ServiceContext, LangchainEmbedding
 # load in HF embedding model from langchain
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from langchain.embeddings.self_hosted import SelfHostedEmbeddings
-from custom_Embedding import CustomEmbedding
 
 llm_predictor = LLMPredictor(llm=CustomLLM())
 embed_model = LangchainEmbedding(
