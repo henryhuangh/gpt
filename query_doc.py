@@ -14,8 +14,8 @@ service_context = ServiceContext.from_defaults(
 
 
 index = GPTSimpleVectorIndex.load_from_disk(
-    'EquityFrictions.json', service_context=service_context)
+    'gpt-pdf.json', service_context=service_context)
 
-response = index.query("Define a competitive equilibrium?", mode="default",
+response = index.query("What is a competitve equilibrium?", mode="default",
                        verbose=True)
 print(response)

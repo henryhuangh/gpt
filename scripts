@@ -8,3 +8,5 @@ pip install torch==1.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.
 pip install -i https://test.pypi.org/simple/ bitsandbytes-cuda111
 
 pip3 install --force-reinstall  torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+pip install git+https://github.com/oobabooga/transformers@llama_push
