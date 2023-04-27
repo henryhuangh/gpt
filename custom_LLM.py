@@ -17,12 +17,6 @@ max_chunk_overlap = 20
 
 # prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
 
-
-model = GPTNeoForCausalLM.from_pretrained(
-    "gpt-neo-2.7B")
-tokenizer = AutoTokenizer.from_pretrained("gpt-neo-2.7B")
-
-
 class CustomLLM(LLM):
     # model_name = 'vicuna-7B'
     # model = LlamaForCausalLM.from_pretrained(
