@@ -11,7 +11,7 @@ git fetch origin
 git merge origin
 curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
 yum -y install nodejs
-DIR=/vicuna-7B/
+DIR=./vicuna-7B
 if [ -d "$DIR" ];
 then
     echo "$DIR directory exists."
