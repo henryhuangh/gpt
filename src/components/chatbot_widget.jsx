@@ -38,11 +38,8 @@ const ChatBotWidget = () => {
 
       try {
         const data = await response.json();
-        self.setState({ loading: false, result: "Not found." });
         self.triggetNext();
-        if (data["error"] === "Rate limit exceeded") {
-          self.setState({ loading: false, result: "Not found." });
-        } else if (data["response"]) {
+        if (data["response"]) {
           self.setState({ loading: false, result: data["response"] });
           setChatID(data["chat_id"]);
         }
@@ -92,11 +89,7 @@ const ChatBotWidget = () => {
           component: <Post chatID={chatID} />,
           asMessage: true,
           waitAction: true,
-          trigger: "restart",
-        },
-        {
-          id: "restart",
-          options: [{ value: 1, label: "Start new search", trigger: "1" }],
+          trigger: "search",
         },
       ]}
       floating
