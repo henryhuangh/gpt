@@ -7,9 +7,8 @@ if platform == "linux" or platform == "linux2":
 elif platform == "win32":
     pass
 
-
-os.system("python -m pip install -r requirements.txt")
-os.system("python -m pip install --force-reinstall  torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
+os.system("source activate pytorch")
+os.system("pip3 install --user -r requirements.txt")
 
 from sentence_transformers import SentenceTransformer
 

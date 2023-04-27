@@ -7,3 +7,4 @@ bitsandbytes
 runhouse
 flask
 flask_cors
+flask_caching

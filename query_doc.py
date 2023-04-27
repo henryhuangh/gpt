@@ -3,10 +3,11 @@ from custom_LLM import CustomLLM, prompt_helper
 from llama_index import ServiceContext, LangchainEmbedding
 # load in HF embedding model from langchain
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain.embeddings.llamacpp import LlamaCppEmbeddings
 
 llm_predictor = LLMPredictor(llm=CustomLLM())
 embed_model = LangchainEmbedding(
-    HuggingFaceEmbeddings(model_name='all-mpnet-base-v2'))
+    LangchainEmbedding(model_name='llama-7B'))
 
 
 service_context = ServiceContext.from_defaults(

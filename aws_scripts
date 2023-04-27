@@ -1,7 +1,8 @@
-sudo su
+source activate pytorch
 yum install git -y
 yum install python -y
 yum install python-pip -y
 git clone https://github.com/henryhuangh/gpt.git
 cd gpt
 python installers.py
+flask --app=server.py run --host=0.0.0.0
