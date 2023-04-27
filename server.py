@@ -76,4 +76,4 @@ def get_mem():
 
 
 if __name__ in "__main__":
-    app.run()
+    app.run(host='0.0.0.0', port=80)
