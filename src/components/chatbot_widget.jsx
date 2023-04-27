@@ -27,7 +27,7 @@ const ChatBotWidget = () => {
       const self = this;
       const { steps, chatID } = this.props;
       const query = steps.search.value;
-      const response = await fetch("/chat", {
+      const response = await fetch("http://ryerson.xyz/chat", {
         method: "POST",
         body: JSON.stringify({
           response: query,
@@ -38,11 +38,9 @@ const ChatBotWidget = () => {
 
       try {
         const data = await response.json();
+        console.log(data);
+        self.setState({ loading: false, result: data["response"] });
         self.triggetNext();
-        if (data["response"]) {
-          self.setState({ loading: false, result: data["response"] });
-          setChatID(data["chat_id"]);
-        }
       } catch (err) {
         console.log("Error: ", err);
         self.setState({ loading: false, result: "Sorry, an error occured" });

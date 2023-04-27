@@ -34,6 +34,7 @@ class CustomLLM(LLM):
         prompt_length = len(prompt)
         response = requests.post('http://127.0.0.1/text_generation', json={'query':prompt, 'max_new_tokens':num_output}).json()[
             0]["generated_text"]
+        print(response)
         response = response[prompt_length:]
         response = re.split('(\n+AI:|\n+Human:)', response)[0]
         # only return newly generated tokens
