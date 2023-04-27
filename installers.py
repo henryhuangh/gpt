@@ -1,7 +1,7 @@
 import os
 from sys import platform
 
-if platform == "linux" or platform == "linux2"
+if platform == "linux" or platform == "linux2":
     os.system("curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -")
     os.system("yum -y install nodejs")
     os.system("mkdir vicuna-7B")
