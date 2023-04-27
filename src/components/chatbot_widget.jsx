@@ -40,6 +40,7 @@ const ChatBotWidget = () => {
         const data = await response.json();
         console.log(data);
         self.setState({ loading: false, result: data["response"] });
+        setChatID(data["chat_id"]);
         self.triggetNext();
       } catch (err) {
         console.log("Error: ", err);
