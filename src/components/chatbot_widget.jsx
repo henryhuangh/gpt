@@ -4,66 +4,50 @@ import ChatBot, { Loading } from "react-simple-chatbot";
 
 const ChatBotWidget = () => {
   const [chatID, setChatID] = useState(null);
-  class Post extends Component {
-    constructor(props) {
-      super(props);
+  const Post = (props) => {
+    const [loading, setLoading] = useState(true);
+    const [result, setResult] = useState("");
+    const [trigger, setTrigger] = useState(false);
 
-      this.state = {
-        loading: true,
-        result: "",
-        trigger: false,
-      };
+    const triggetNext = () => {
+      setTrigger(true);
+      props.triggerNextStep();
+    };
+    useEffect(() => {
+      async function fetchResponse() {
+        const query = props.steps.search.value;
 
-      this.triggetNext = this.triggetNext.bind(this);
-    }
-
-    triggetNext() {
-      this.setState({ trigger: true }, () => {
-        this.props.triggerNextStep();
-      });
-    }
-
-    async componentWillMount() {
-      const self = this;
-      const { steps, chatID } = this.props;
-      const query = steps.search.value;
-      const response = await fetch("http://ryerson.xyz/chat", {
-        method: "POST",
-        body: JSON.stringify({
-          response: query,
-          chat_id: chatID === null ? undefined : chatID,
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      try {
-        const data = await response.json();
-        console.log(data);
-        self.setState({ loading: false, result: data["response"] });
-        setChatID(data["chat_id"]);
-        self.triggetNext();
-      } catch (err) {
-        console.log("Error: ", err);
-        self.setState({ loading: false, result: "Sorry, an error occured" });
+        const response = await fetch("http://ryerson.xyz/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            response: query,
+            chat_id: props.chat_id === null ? undefined : props.chat_id,
+          }),
+        });
+        console.log(response);
+        try {
+          const data = await response.json();
+          console.log(data);
+          setLoading(false);
+          setResult(data["response"]);
+          props.setChatID(data["chat_id"]);
+          triggetNext();
+        } catch (err) {
+          console.log("Error: ", err);
+          setLoading(false);
+          setResult("Sorry, an error occured");
+        }
       }
-    }
+      fetchResponse();
+    }, []);
 
-    render() {
-      const { trigger, loading, result } = this.state;
-
-      return <div>{loading ? <Loading /> : result}</div>;
-    }
-  }
-
-  Post.propTypes = {
-    steps: PropTypes.object,
-    triggerNextStep: PropTypes.func,
+    return <div>{loading ? <Loading /> : result}</div>;
   };
 
-  Post.defaultProps = {
-    steps: undefined,
-    triggerNextStep: undefined,
-  };
   return (
     <ChatBot
       steps={[
@@ -85,7 +69,7 @@ const ChatBotWidget = () => {
         },
         {
           id: "result",
-          component: <Post chatID={chatID} />,
+          component: <Post chat_id={chatID} setChatID={setChatID} />,
           asMessage: true,
           waitAction: true,
           trigger: "search",
