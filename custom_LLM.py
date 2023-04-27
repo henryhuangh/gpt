@@ -1,7 +1,5 @@
-from pyexpat import model
 from langchain.llms.base import LLM
 from transformers import pipeline
-from llama_index import SimpleDirectoryReader, LangchainEmbedding, GPTListIndex, PromptHelper
 from typing import Optional, List, Mapping, Any
 from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFast
 import torch
@@ -17,7 +15,7 @@ num_output = 256
 # set maximum chunk overlap
 max_chunk_overlap = 20
 
-prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
+# prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
 
 
 model = GPTNeoForCausalLM.from_pretrained(

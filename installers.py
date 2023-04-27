@@ -1,7 +1,9 @@
 import os
 from sys import platform
 
-if platform == "linux" or platform == "linux2":
+if platform == "linux" or platform == "linux2"
+    os.system("curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -")
+    os.system("yum -y install nodejs")
     os.system("mkdir vicuna-7B")
     os.system("aws s3 cp s3://llm-models-0/vicuna-7B/ ./vicuna-7B --recursive")
 elif platform == "win32":
