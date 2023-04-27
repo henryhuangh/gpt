@@ -1,6 +1,4 @@
 source activate pytorch
-yum install nodejs
-yum install npm
 yum install git -y
 yum install python -y
 yum install python-pip -y
@@ -9,4 +7,4 @@ cd gpt
 npm install
 npm run build
 python installers.py
-flask --app=server.py run --host=0.0.0.0
+flask --app=server.py run --host=0.0.0.0 --port=80

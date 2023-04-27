@@ -5,6 +5,7 @@ from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeo
 import torch
 import requests
 import os
+import re
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:24"
 torch.cuda.empty_cache()
 # define prompt helper
@@ -31,9 +32,10 @@ class CustomLLM(LLM):
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
         prompt_length = len(prompt)
-        response = requests.post('http://127.0.0.1/text_generation', json={'query':prompt, 'max_new_tokens':num_output})[
+        response = requests.post('http://127.0.0.1/text_generation', json={'query':prompt, 'max_new_tokens':num_output}).json()[
             0]["generated_text"]
-
+        response = response[prompt_length:]
+        response = re.split('(\n+AI:|\n+Human:)', response)[0]
         # only return newly generated tokens
         return response[prompt_length:]
 
