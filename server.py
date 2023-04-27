@@ -19,7 +19,7 @@ generator = pipeline("text-generation", model=model,
 
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='build', static_url_path='')
 cors = CORS(app)
 cache = Cache(app)
 
@@ -42,8 +42,8 @@ def text_generation():
 
 @app.route('/', methods=['GET'])
 @cross_origin()
-def live():
-    return "live"
+def serve():
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/chat', methods=['POST'])
 @cross_origin()
