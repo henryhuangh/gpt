@@ -2,14 +2,14 @@ import os
 from sys import platform
 
 if platform == "linux" or platform == "linux2":
-    os.system("source activate pytorch")
-    if not os.path.isdir("gpt"):
-        os.system("git clone https://github.com/henryhuangh/gpt.git")
+    # os.system("source activate pytorch")
+    # if not os.path.isdir("gpt"):
+    #     os.system("git clone https://github.com/henryhuangh/gpt_chatbot.git")
 
-    else:
-        os.system("cd gpt")
-        os.system("git fetch origin")
-        os.system("git merge origin")
+    # else:
+    #     os.system("cd gpt")
+    os.system("git fetch origin")
+    os.system("git merge origin")
     os.system("curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -")
     os.system("yum -y install nodejs")
     if not os.path.isdir("vicuna-7B"):
