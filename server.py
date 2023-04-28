@@ -58,8 +58,8 @@ def chat():
         chat_id = str(uuid.uuid4())
     
     if conversation is None:
-        memory = ConversationSummaryMemory(llm=llm)
         llm = CustomLLM()
+        memory = ConversationSummaryMemory(llm=llm)
         conversation = ConversationChain(
             llm=llm, 
             memory=memory
