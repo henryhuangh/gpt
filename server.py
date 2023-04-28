@@ -9,6 +9,7 @@ import uuid
 from custom_LLM import CustomLLM
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
+from langchain.chains.conversation.memory import ConversationSummaryMemory
 
 
 model = LlamaForCausalLM.from_pretrained(
@@ -57,7 +58,7 @@ def chat():
         chat_id = str(uuid.uuid4())
     
     if conversation is None:
-        memory = ConversationBufferMemory()
+        memory = ConversationSummaryMemory(llm=llm)
         llm = CustomLLM()
         conversation = ConversationChain(
             llm=llm, 
