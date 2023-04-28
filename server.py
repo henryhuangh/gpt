@@ -59,7 +59,7 @@ def chat():
     
     if conversation is None:
         llm = CustomLLM()
-        memory = ConversationSummaryMemory(llm=llm)
+        memory = ConversationBufferMemory()
         conversation = ConversationChain(
             llm=llm, 
             memory=memory
