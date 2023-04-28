@@ -1,9 +1,10 @@
 import React, { Component, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ChatBot, { Loading } from "react-simple-chatbot";
+import { v4 as uuidv4 } from "uuid";
 
 const ChatBotWidget = () => {
-  const [chatID, setChatID] = useState(null);
+  const [chatID, setChatID] = useState(uuidv4());
   const Post = (props) => {
     const [loading, setLoading] = useState(true);
     const [result, setResult] = useState("");
@@ -34,7 +35,6 @@ const ChatBotWidget = () => {
           console.log(data);
           setLoading(false);
           setResult(data["response"]);
-          props.setChatID(data["chat_id"]);
           triggetNext();
         } catch (err) {
           console.log("Error: ", err);

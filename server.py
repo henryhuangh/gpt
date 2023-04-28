@@ -52,7 +52,7 @@ def chat():
     if "chat_id" in data:
         conversation = cache.get(data["chat_id"])
         chat_id = data["chat_id"]
-    else:
+    elif not conversation or "chat_id" not in data:
         memory = ConversationBufferMemory()
         llm = CustomLLM()
         conversation = ConversationChain(
@@ -61,7 +61,7 @@ def chat():
         )
 
         chat_id = str(uuid.uuid4())
-    
+
     response = conversation.predict(input=data["response"])
 
     cache.set(chat_id, conversation)
