@@ -13,8 +13,8 @@ from langchain.chains.conversation.memory import ConversationSummaryMemory
 
 
 model = LlamaForCausalLM.from_pretrained(
-    "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
-tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
+    "llama-13B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
+tokenizer = LlamaTokenizer.from_pretrained("llama-13B")
 generator = pipeline("text-generation", model=model,
                tokenizer=tokenizer)
 

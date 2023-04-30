@@ -11,13 +11,13 @@ git fetch origin
 git merge origin
 curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
 yum -y install nodejs
-DIR=./vicuna-7B
+DIR=./llama-13B
 if [ -d "$DIR" ];
 then
     echo "$DIR directory exists."
 else
-    mkdir vicuna-7B
-    aws s3 cp s3://llm-models-0/vicuna-7B/ ./vicuna-7B --recursive
+    wget https://llm-models-0.s3.us-east-2.amazonaws.com/llama-13B.zip
+    jar xvf llama-13B.zip
 fi
 npm install
 npm run build
