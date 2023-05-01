@@ -4,7 +4,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_caching import Cache
 import torch
-from transformers import LlamaForCausalLM, LlamaTokenizer, GPTNeoForCausalLM, AutoTokenizer, pipeline
+from transformers import LlamaForCausalLM, LlamaTokenizer, GPTNeoForCausalLM, AutoTokenizer, pipeline, LlamaTokenizer
 import uuid
 from custom_LLM import CustomLLM
 from langchain.chains import ConversationChain
@@ -13,8 +13,8 @@ from langchain.chains.conversation.memory import ConversationSummaryMemory
 
 
 model = LlamaForCausalLM.from_pretrained(
-    "llama-13B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
-tokenizer = LlamaTokenizer.from_pretrained("llama-13B")
+    "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
+tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
 generator = pipeline("text-generation", model=model,
                tokenizer=tokenizer)
 
