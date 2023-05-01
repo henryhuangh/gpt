@@ -61,7 +61,7 @@ const ChatBotWidget = () => {
           user: true,
           validator: (value) => {
             if (value == "") {
-              return "query should not be blank";
+              return "message should not be blank";
             }
             return true;
           },
