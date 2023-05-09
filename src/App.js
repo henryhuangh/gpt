@@ -6,9 +6,9 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <img src={logo} alt="logo" className="mx-5" />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Chatbot
         </p>
         <a
           className="App-link"

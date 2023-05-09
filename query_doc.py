@@ -8,7 +8,6 @@ model_name = "sentence-transformers/all-MiniLM-L6-v2"
 embed = LangchainEmbedding(HuggingFaceEmbeddings(model_name=model_name))
 
 
-query_str = "What did the author do growing up?"
 QA_PROMPT_TMPL = (
     "We have provided context information below. \n"
     "---------------------\n"

@@ -10,13 +10,30 @@ from custom_LLM import CustomLLM
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 from langchain.chains.conversation.memory import ConversationSummaryMemory
+from llama_index import GPTVectorStoreIndex, SimpleDirectoryReader, Document, LLMPredictor, LangchainEmbedding, ServiceContext, QuestionAnswerPrompt, StorageContext, load_index_from_storage
+from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+
+llm = LLMPredictor(CustomLLM())
+model_name = "sentence-transformers/all-MiniLM-L6-v2"
+embed = LangchainEmbedding(HuggingFaceEmbeddings(model_name=model_name))
 
 
-model = LlamaForCausalLM.from_pretrained(
-    "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
-tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
-generator = pipeline("text-generation", model=model,
-               tokenizer=tokenizer)
+QA_PROMPT_TMPL = (
+    "We have provided context information below. \n"
+    "---------------------\n"
+    "Context: {context_str}"
+    "\n---------------------\n"
+    "Given this information, please answer the question: {query_str}\nAnswer:"
+)
+QA_PROMPT = QuestionAnswerPrompt(QA_PROMPT_TMPL)
+
+service_context = ServiceContext.from_defaults(llm_predictor=llm, embed_model=embed, chunk_size_limit=900)
+storage_context = StorageContext.from_defaults(persist_dir='ac_lg_design')
+# index = GPTVectorStoreIndex.from_documents(service_context=service_context, storage_context=storage_context)
+index=load_index_from_storage(storage_context=storage_context, service_context=service_context)
+index._include_extra_info = True
+# query_engine = index.as_query_engine()
+query_engine = index.as_query_engine(text_qa_template=QA_PROMPT)
 
 
 config = {
@@ -30,16 +47,6 @@ cors = CORS(app)
 app.config.from_mapping(config)
 cache = Cache(app)
 
-@app.route('/text_generation', methods=['POST'])
-@cross_origin()
-def text_generation():
-    data = request.get_json()
-    response = jsonify(
-        generator(data["query"], 
-        do_sample=True, 
-        temperature=data.get("temperature", 0.9), 
-        max_new_tokens=data.get("max_new_tokens", 256)))
-    return response
 
 @app.route('/', methods=['GET'])
 @cross_origin()
@@ -50,32 +57,11 @@ def serve():
 @cross_origin()
 def chat():
     data = request.get_json()
-    if "chat_id" in data:
-        conversation = cache.get(data["chat_id"])
-        chat_id = data["chat_id"]
-    else:
-        conversation = None
-        chat_id = str(uuid.uuid4())
-    
-    if conversation is None:
-        llm = CustomLLM()
-        memory = ConversationBufferMemory()
-        conversation = ConversationChain(
-            llm=llm, 
-            memory=memory
-        )
 
-    response = conversation.predict(input=data["response"])
+    answer = query_engine.query(data["response"])
+    return jsonify({"response": answer.response, 'chat_id': '0'})
 
-    cache.set(chat_id, conversation)
-    return jsonify({"response": response, "chat_id": chat_id})
 
-@app.route('/get_mem', methods=['POST'])
-@cross_origin()
-def get_mem():
-    data = request.get_json()
-    conversation = cache.get(data["chat_id"])
-    return jsonify(conversation.memory.json())
 
 
 if __name__ in "__main__":

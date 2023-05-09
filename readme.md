@@ -18,11 +18,14 @@ in the terminal run
 
 It will need ports 80, 22 and 443 open. Configure this in EC2 security groups.
 
-# Windows
 
+# Windows
 
 `python -m pip install -r requirements.txt`
 
 `npm install`
 
 `npm run build`
+
+# Index docs
+change the directory in the index_doc.py file then run the file
