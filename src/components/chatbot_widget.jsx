@@ -76,6 +76,9 @@ const ChatBotWidget = () => {
         },
       ]}
       floating
+      width={"600px"}
+      userDelay={200}
+      customDelay={20}
       headerTitle={"Ask me anything"}
     />
   );
