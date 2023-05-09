@@ -17,3 +17,12 @@ in the terminal run
 # Setup EC2 Instance
 
 It will need ports 80, 22 and 443 open. Configure this in EC2 security groups.
+
+# Windows
+
+
+`python -m pip install -r requirements.txt`
+
+`npm install`
+
+`npm run build`

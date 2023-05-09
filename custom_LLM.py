@@ -2,6 +2,7 @@ from langchain.llms.base import LLM
 from transformers import pipeline
 from typing import Optional, List, Mapping, Any
 from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFast
+from llama_index import PromptHelper
 import torch
 import requests
 import os
@@ -32,8 +33,14 @@ class CustomLLM(LLM):
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None) -> str:
         prompt_length = len(prompt)
-        response = requests.post('http://127.0.0.1/text_generation', json={'query':prompt, 'max_new_tokens':num_output}).json()[
-            0]["generated_text"]
+
+
+        response = requests.post('http://ryerson.xyz/text_generation', json={'query':prompt, 'max_new_tokens': num_output, 'temperature': 0.2})
+        try:
+            response = response.json()[
+                0]["generated_text"]
+        except:
+            print(response.text)
 
         response = response[prompt_length:]
         response = re.split('(\n+AI:|\n+Human:)', response)[0]

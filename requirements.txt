@@ -1,5 +1,5 @@
 accelerate
-llama_index
+llama_index==0.6.2
 PyPDF2
 protobuf==3.20.1
 sentence_transformers
