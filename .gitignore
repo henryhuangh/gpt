@@ -6,6 +6,7 @@ alpaca-native-1
 llama-7B
 vicuna-7B
 vicuna-7b-delta-v1.1
+vicuna-13B
 venv
 __pycache__/
 *.py[cod]

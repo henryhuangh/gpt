@@ -12,12 +12,34 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains.conversation.memory import ConversationSummaryMemory
 
 
-model = LlamaForCausalLM.from_pretrained(
-    "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
-tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
-generator = pipeline("text-generation", model=model,
-               tokenizer=tokenizer)
+# model = LlamaForCausalLM.from_pretrained(
+#     "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
+# tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
+# generator = pipeline("text-generation", model=model,
+#                tokenizer=tokenizer)
+from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
+from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline
 
+quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
+model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
+
+use_triton = False
+
+
+quantize_config = BaseQuantizeConfig(
+    bits=4,
+    group_size=128,
+    desc_act=False
+)
+
+model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
+                                           use_safetensors=True,
+                                           model_basename=model_basename,
+                                           device="cuda:0",
+                                           use_triton=use_triton,
+                                           quantize_config=quantize_config)
+tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
+generator = TextGenerationPipeline(model=model, tokenizer=tokenizer)
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -30,21 +52,24 @@ cors = CORS(app)
 app.config.from_mapping(config)
 cache = Cache(app)
 
+
 @app.route('/text_generation', methods=['POST'])
 @cross_origin()
 def text_generation():
     data = request.get_json()
     response = jsonify(
-        generator(data["query"], 
-        do_sample=True, 
-        temperature=data.get("temperature", 0.9), 
-        max_new_tokens=data.get("max_new_tokens", 256)))
+        generator(data["query"],
+                  do_sample=True,
+                  temperature=data.get("temperature", 0.9),
+                  max_new_tokens=data.get("max_new_tokens", 256)))
     return response
+
 
 @app.route('/', methods=['GET'])
 @cross_origin()
 def serve():
     return send_from_directory(app.static_folder, 'index.html')
+
 
 @app.route('/chat', methods=['POST'])
 @cross_origin()
@@ -56,12 +81,12 @@ def chat():
     else:
         conversation = None
         chat_id = str(uuid.uuid4())
-    
+
     if conversation is None:
         llm = CustomLLM()
         memory = ConversationBufferMemory()
         conversation = ConversationChain(
-            llm=llm, 
+            llm=llm,
             memory=memory
         )
 
@@ -69,6 +94,7 @@ def chat():
 
     cache.set(chat_id, conversation)
     return jsonify({"response": response, "chat_id": chat_id})
+
 
 @app.route('/get_mem', methods=['POST'])
 @cross_origin()

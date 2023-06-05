@@ -18,7 +18,7 @@ const ChatBotWidget = () => {
       async function fetchResponse() {
         const query = props.steps.search.value;
 
-        const response = await fetch("http://ryerson.xyz/chat", {
+        const response = await fetch("/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -76,7 +76,11 @@ const ChatBotWidget = () => {
         },
       ]}
       floating
+      width={"600px"}
+      userDelay={200}
+      customDelay={20}
       headerTitle={"Ask me anything"}
+      height={"700px"}
     />
   );
 };
