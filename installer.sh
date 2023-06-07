@@ -11,15 +11,15 @@ git fetch origin
 git merge origin
 curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
 yum -y install nodejs
-DIR=./vicuna-7B
-if [ -d "$DIR" ];
-then
-    echo "$DIR directory exists."
-else
-    wget https://llm-models-0.s3.us-east-2.amazonaws.com/vicuna-7B.zip
-    jar xvf vicuna-7B.zip
-    rm -f vicuna-7B.zip
-fi
+# DIR=./vicuna-7B
+# if [ -d "$DIR" ];
+# then
+#     echo "$DIR directory exists."
+# else
+#     wget https://llm-models-0.s3.us-east-2.amazonaws.com/vicuna-7B.zip
+#     jar xvf vicuna-7B.zip
+#     rm -f vicuna-7B.zip
+# fi
 npm install
 npm run build
 pip3 install --user -r requirements.txt

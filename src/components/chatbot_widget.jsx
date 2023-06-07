@@ -18,23 +18,35 @@ const ChatBotWidget = () => {
       async function fetchResponse() {
         const query = props.steps.search.value;
 
-        const response = await fetch("/chat", {
+        const response = await fetch("/text_generation", {
           method: "POST",
+          keepalive: true,
           headers: {
             "Content-Type": "application/json",
-            Accept: "application/json",
+            Accept: "text/event-stream",
           },
           body: JSON.stringify({
-            response: query,
+            query,
             chat_id: props.chat_id === null ? undefined : props.chat_id,
           }),
         });
-        console.log(response);
         try {
-          const data = await response.json();
-          console.log(data);
+          const reader = response.body.getReader();
+          if (!response.ok) {
+            throw new Error("HTTP status " + response.status);
+          }
           setLoading(false);
-          setResult(data["response"]);
+          var resultText = "";
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            resultText += new TextDecoder().decode(value);
+            setResult(resultText);
+          }
+          // const data = await response.json();
+          // console.log(data);
+
+          // setResult(data["response"]);
           triggetNext();
         } catch (err) {
           console.log("Error: ", err);
