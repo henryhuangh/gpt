@@ -18,7 +18,7 @@ const ChatBotWidget = () => {
       async function fetchResponse() {
         const query = props.steps.search.value;
 
-        const response = await fetch("/text_generation", {
+        const response = await fetch("/chat", {
           method: "POST",
           keepalive: true,
           headers: {
@@ -26,7 +26,7 @@ const ChatBotWidget = () => {
             Accept: "text/event-stream",
           },
           body: JSON.stringify({
-            query,
+            response: query,
             chat_id: props.chat_id === null ? undefined : props.chat_id,
           }),
         });

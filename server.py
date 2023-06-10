@@ -21,16 +21,16 @@ from threading import Thread
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextIteratorStreamer
 
-quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
-model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
+quantized_model_dir = "TheBloke/guanaco-33B-GPTQ"
+model_basename = "Guanaco-33B-GPTQ-4bit.act-order"
 
 use_triton = False
 
 
 quantize_config = BaseQuantizeConfig(
     bits=4,
-    group_size=128,
-    desc_act=False
+    # group_size=128,
+    # desc_act=False
 )
 
 model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
@@ -89,67 +89,69 @@ def serve():
     return send_from_directory(app.static_folder, 'index.html')
 
 
-# @app.route('/chat', methods=['POST'])
-# @cross_origin()
-# def chat():
-#     from custom_LLM import CustomLLM
-#     data = request.get_json()
-#     if request.headers.get('accept') == 'text/event-stream':
-#         from queue import Queue
-#         q = Queue(1)
-#         if "chat_id" in data:
-#             conversation = cache.get(data["chat_id"])
-#             chat_id = data["chat_id"]
-#         else:
-#             conversation = None
-#             chat_id = str(uuid.uuid4())
+@app.route('/chat', methods=['POST'])
+@cross_origin()
+def chat():
+    from custom_LLM import CustomLLM
+    data = request.get_json()
+    if request.headers.get('accept') == 'text/event-stream':
+        from queue import Queue
+        q = Queue(1)
+        if "chat_id" in data:
+            conversation_mem = cache.get(data["chat_id"])
+            chat_id = data["chat_id"]
+        else:
+            conversation_mem = None
+            chat_id = str(uuid.uuid4())
 
-#         if conversation is None:
-#             class CustomHandler(BaseCallbackHandler):
-#                 def on_llm_new_token(self, token: str, **kwargs) -> None:
-#                     q.put(token)
+        if conversation_mem is None:
+            conversation_mem = ConversationBufferMemory()
 
-#             llm = CustomLLM(streaming=True, callbacks=[CustomHandler()])
-#             memory = ConversationBufferMemory()
-#             conversation = ConversationChain(
-#                 llm=llm,
-#                 memory=memory
-#             )
+        class CustomHandler(BaseCallbackHandler):
+            def on_llm_new_token(self, token: str, **kwargs) -> None:
+                q.put(token)
 
-#         def resolve_convo(input):
-#             conversation.predict(input=input)
-#         input = data["response"]
-#         thread = Thread(target=resolve_convo, args=(input, ), daemon=True)
-#         thread.start()
+        llm = CustomLLM(streaming=True, callbacks=[CustomHandler()])
+        conversation = ConversationChain(
+            llm=llm,
+            memory=conversation_mem
+        )
+        done = object()
 
-#         def stream():
-#             while True:
-#                 new_text = q.get(timeout=2)
-#                 if '</s>' in new_text:
-#                     yield new_text
-#                     break
-#                 yield new_text
-#         cache.set(chat_id, conversation)
-#         return Response(stream(), content_type='text/event-stream')
-#     else:
-#         if "chat_id" in data:
-#             conversation = cache.get(data["chat_id"])
-#             chat_id = data["chat_id"]
-#         else:
-#             conversation = None
-#             chat_id = str(uuid.uuid4())
+        def resolve_convo(input):
+            conversation.predict(input=input)
+            q.put(done)
+        input = data["response"]
+        thread = Thread(target=resolve_convo, args=(input, ), daemon=True)
+        thread.start()
 
-#         if conversation is None:
-#             llm = CustomLLM()
-#             memory = ConversationBufferMemory()
-#             conversation = ConversationChain(
-#                 llm=llm,
-#                 memory=memory
-#             )
+        def stream():
+            while True:
+                new_text = q.get(timeout=2)
+                if new_text is done:
+                    break
+                yield new_text
+        cache.set(chat_id, conversation.memory)
+        return Response(stream(), content_type='text/event-stream')
+    else:
+        if "chat_id" in data:
+            conversation = cache.get(data["chat_id"])
+            chat_id = data["chat_id"]
+        else:
+            conversation = None
+            chat_id = str(uuid.uuid4())
 
-#         response = conversation.predict(input=data["response"])
-#         cache.set(chat_id, conversation)
-#         return jsonify({"response": response, "chat_id": chat_id})
+        if conversation is None:
+            llm = CustomLLM()
+            memory = ConversationBufferMemory()
+            conversation = ConversationChain(
+                llm=llm,
+                memory=memory
+            )
+
+        response = conversation.predict(input=data["response"])
+        cache.set(chat_id, conversation)
+        return jsonify({"response": response, "chat_id": chat_id})
 
 
 @app.route('/get_mem', methods=['POST'])
