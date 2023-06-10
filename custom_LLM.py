@@ -17,7 +17,7 @@ from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGe
 
 # prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
 quantized_model_dir = "TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g"
-model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order.pt"
+model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order"
 
 use_triton = False
 
@@ -29,7 +29,7 @@ quantize_config = BaseQuantizeConfig(
 )
 
 model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
-                                           use_safetensors=True,
+                                           #    use_safetensors=True,
                                            model_basename=model_basename,
                                            device="cuda:0",
                                            use_triton=use_triton,
