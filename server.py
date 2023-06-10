@@ -128,7 +128,7 @@ def chat():
         def stream():
             while True:
                 new_text = q.get(timeout=2)
-                if new_text is done or ':' in new_text:
+                if new_text is done or 'human:' in new_text:
                     break
                 yield new_text.replace('</s>', '')
         cache.set(chat_id, conversation.memory)

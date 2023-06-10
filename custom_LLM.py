@@ -18,6 +18,8 @@ from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGe
 # prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
 quantized_model_dir = "TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g"
 model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order"
+# quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
+# model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
 
 use_triton = False
 
@@ -40,7 +42,7 @@ generator = TextGenerationPipeline(
 
 
 class CustomLLM(LLM):
-    model_name = 'Guanaco-7B-GPTQ'
+    model_name = 'vicuna-13B-GPTQ'
     streaming: bool = False
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None,) -> str:
