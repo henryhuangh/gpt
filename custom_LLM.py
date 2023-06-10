@@ -15,34 +15,39 @@ from threading import Thread
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextStreamer, TextIteratorStreamer
 
-# prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
-quantized_model_dir = "TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g"
-model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order"
-# quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
-# model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
+model = LlamaForCausalLM.from_pretrained(
+    "vicuna-13B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
+tokenizer = LlamaTokenizer.from_pretrained("vicuna-13B")
+generator = pipeline("text-generation", model=model,
+                     tokenizer=tokenizer)
 
-use_triton = False
+# quantized_model_dir = "TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g"
+# model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order"
+# # quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
+# # model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
+
+# use_triton = False
 
 
-quantize_config = BaseQuantizeConfig(
-    bits=4,
-    group_size=128,
-    desc_act=False
-)
+# quantize_config = BaseQuantizeConfig(
+#     bits=4,
+#     group_size=128,
+#     desc_act=False
+# )
 
-model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
-                                           #    use_safetensors=True,
-                                           model_basename=model_basename,
-                                           device="cuda:0",
-                                           use_triton=use_triton,
-                                           quantize_config=quantize_config).to('cuda')
-tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
-generator = TextGenerationPipeline(
-    model=model, tokenizer=tokenizer)
+# model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
+#                                            #    use_safetensors=True,
+#                                            model_basename=model_basename,
+#                                            device="cuda:0",
+#                                            use_triton=use_triton,
+#                                            quantize_config=quantize_config).to('cuda')
+# tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
+# generator = TextGenerationPipeline(
+#     model=model, tokenizer=tokenizer)
 
 
 class CustomLLM(LLM):
-    model_name = 'vicuna-13B-GPTQ'
+    model_name = 'vicuna-13B'
     streaming: bool = False
 
     def _call(self, prompt: str, stop: Optional[List[str]] = None, run_manager: Optional[CallbackManagerForLLMRun] = None,) -> str:
@@ -53,7 +58,7 @@ class CustomLLM(LLM):
         if self.streaming:
             stream_resp = TextIteratorStreamer(tokenizer, skip_prompt=True)
             generation_kwargs = dict(
-                inputs=inputs, streamer=stream_resp, max_new_tokens=256, no_repeat_ngram_size=2,
+                inputs=inputs, streamer=stream_resp, max_new_tokens=512, no_repeat_ngram_size=2,
                 early_stopping=True)
 
             thread = Thread(target=model.generate,
