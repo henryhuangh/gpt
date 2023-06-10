@@ -21,8 +21,8 @@ from threading import Thread
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextIteratorStreamer
 
-quantized_model_dir = "TheBloke/guanaco-33B-GPTQ"
-model_basename = "Guanaco-33B-GPTQ-4bit.act-order"
+quantized_model_dir = "anon8231489123/vicuna-13b-GPTQ-4bit-128g"
+model_basename = "vicuna-13b-4bit-128g"
 
 use_triton = False
 
