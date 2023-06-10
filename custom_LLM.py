@@ -16,8 +16,8 @@ from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextStreamer, TextIteratorStreamer
 
 # prompt_helper = PromptHelper(max_input_size, num_output, max_chunk_overlap)
-quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
-model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
+quantized_model_dir = "TheBloke/vicuna-13B-1.1-GPTQ-4bit-128g"
+model_basename = "vicuna-13B-1.1-GPTQ-4bit-128g.compat.no-act-order.pt"
 
 use_triton = False
 

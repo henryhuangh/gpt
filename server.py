@@ -11,6 +11,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains.conversation.memory import ConversationSummaryMemory
 from langchain.callbacks.base import BaseCallbackHandler
 from threading import Thread
+from custom_LLM import CustomLLM, model, tokenizer, generator
 
 
 # model = LlamaForCausalLM.from_pretrained(
@@ -21,27 +22,27 @@ from threading import Thread
 from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
 from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextIteratorStreamer
 
-quantized_model_dir = "anon8231489123/vicuna-13b-GPTQ-4bit-128g"
-model_basename = "vicuna-13b-4bit-128g"
+# quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
+# model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
 
-use_triton = False
+# use_triton = False
 
 
-quantize_config = BaseQuantizeConfig(
-    bits=4,
-    # group_size=128,
-    # desc_act=False
-)
+# quantize_config = BaseQuantizeConfig(
+#     bits=4,
+#     group_size=128,
+#     desc_act=False
+# )
 
-model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
-                                           use_safetensors=True,
-                                           model_basename=model_basename,
-                                           device="cuda:0",
-                                           use_triton=use_triton,
-                                           quantize_config=quantize_config).to('cuda')
-tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
-generator = TextGenerationPipeline(
-    model=model, tokenizer=tokenizer)
+# model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
+#                                            use_safetensors=True,
+#                                            model_basename=model_basename,
+#                                            device="cuda:0",
+#                                            use_triton=use_triton,
+#                                            quantize_config=quantize_config).to('cuda')
+# tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
+# generator = TextGenerationPipeline(
+#     model=model, tokenizer=tokenizer)
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -92,7 +93,6 @@ def serve():
 @app.route('/chat', methods=['POST'])
 @cross_origin()
 def chat():
-    from custom_LLM import CustomLLM
     data = request.get_json()
     if request.headers.get('accept') == 'text/event-stream':
         from queue import Queue
