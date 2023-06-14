@@ -1,7 +1,7 @@
 from langchain.llms.base import LLM
 from transformers import pipeline
 from typing import Optional, List, Mapping, Any
-from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFasts
+from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFast
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
