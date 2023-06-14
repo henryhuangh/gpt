@@ -12,37 +12,8 @@ from langchain.chains.conversation.memory import ConversationSummaryMemory
 from langchain.callbacks.base import BaseCallbackHandler
 from threading import Thread
 from custom_LLM import CustomLLM, model, tokenizer, generator
+from transformers import TextIteratorStreamer
 
-
-# model = LlamaForCausalLM.from_pretrained(
-#     "vicuna-7B", torch_dtype=torch.float16, device_map='auto', load_in_8bit=True)
-# tokenizer = LlamaTokenizer.from_pretrained("vicuna-7B")
-# generator = pipeline("text-generation", model=model,
-#                tokenizer=tokenizer)
-from auto_gptq import AutoGPTQForCausalLM, BaseQuantizeConfig
-from transformers import AutoTokenizer, pipeline, logging, AutoTokenizer, TextGenerationPipeline, TextIteratorStreamer
-
-# quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
-# model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
-
-# use_triton = False
-
-
-# quantize_config = BaseQuantizeConfig(
-#     bits=4,
-#     group_size=128,
-#     desc_act=False
-# )
-
-# model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
-#                                            use_safetensors=True,
-#                                            model_basename=model_basename,
-#                                            device="cuda:0",
-#                                            use_triton=use_triton,
-#                                            quantize_config=quantize_config).to('cuda')
-# tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
-# generator = TextGenerationPipeline(
-#     model=model, tokenizer=tokenizer)
 
 config = {
     "DEBUG": True,          # some Flask specific configs
@@ -66,7 +37,7 @@ def text_generation():
                 [data['query']], return_tensors='pt').input_ids.to('cuda')
             streamer = TextIteratorStreamer(tokenizer, skip_prompt=True)
             generation_kwargs = dict(
-                inputs=inputs, streamer=streamer, max_new_tokens=256, no_repeat_ngram_size=2, early_stopping=True)
+                inputs=inputs, streamer=streamer, max_new_tokens=1024, no_repeat_ngram_size=2, early_stopping=True)
             thread = Thread(target=model.generate,
                             kwargs=generation_kwargs, daemon=True)
             thread.start()
@@ -120,7 +91,9 @@ def chat():
 
         def resolve_convo(input):
             conversation.predict(input=input)
+            cache.set(chat_id, conversation.memory)
             q.put(done)
+
         input = data["response"]
         thread = Thread(target=resolve_convo, args=(input, ), daemon=True)
         thread.start()
@@ -131,7 +104,6 @@ def chat():
                 if new_text is done or 'human:' in new_text:
                     break
                 yield new_text.replace('</s>', '')
-        cache.set(chat_id, conversation.memory)
         return Response(stream(), content_type='text/event-stream')
     else:
         if "chat_id" in data:
