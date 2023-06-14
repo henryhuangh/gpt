@@ -44,7 +44,7 @@ def text_generation():
             generated_text = ""
             for new_text in streamer:
                 generated_text += new_text
-                yield f"{new_text.replace('</s>', ' ')}\n\n"
+                yield f"{new_text.replace(tokenizer.eos_token, ' ')}\n\n"
         return Response(events(), content_type='text/event-stream')
     else:
         response = jsonify(
@@ -103,7 +103,7 @@ def chat():
                 new_text = q.get(timeout=2)
                 if new_text is done or 'human:' in new_text:
                     break
-                yield new_text.replace('</s>', '')
+                yield new_text.replace(tokenizer.eos_token, '')
         return Response(stream(), content_type='text/event-stream')
     else:
         if "chat_id" in data:
