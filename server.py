@@ -101,7 +101,7 @@ def chat():
 
         def stream():
             while True:
-                new_text = q.get(timeout=2)
+                new_text = q.get(timeout=8)
                 if new_text is done or 'human:' in new_text:
                     break
                 yield new_text.replace(tokenizer.eos_token, '')
