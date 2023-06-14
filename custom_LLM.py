@@ -1,12 +1,7 @@
 from langchain.llms.base import LLM
 from transformers import pipeline
 from typing import Optional, List, Mapping, Any
-from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFast
-from llama_index import PromptHelper
-import torch
-import requests
-import os
-import re
+from transformers import LlamaForCausalLM, LlamaTokenizer, AutoTokenizer, GPTNeoForCausalLM, GPT2LMHeadModel, GPT2TokenizerFasts
 from langchain.callbacks.manager import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
@@ -26,8 +21,6 @@ model_basename = "Wizard-Vicuna-30B-Uncensored-GPTQ-4bit.act.order"
 # quantized_model_dir = "TheBloke/guanaco-7B-GPTQ"
 # model_basename = "Guanaco-7B-GPTQ-4bit-128g.no-act-order"
 
-use_triton = False
-
 
 quantize_config = BaseQuantizeConfig(
     bits=4,
@@ -39,7 +32,7 @@ model = AutoGPTQForCausalLM.from_quantized(quantized_model_dir,
                                            use_safetensors=True,
                                            model_basename=model_basename,
                                            device="cuda:0",
-                                           use_triton=use_triton,
+                                           use_triton=False,
                                            quantize_config=quantize_config).to('cuda')
 tokenizer = AutoTokenizer.from_pretrained(quantized_model_dir, use_fast=True)
 generator = TextGenerationPipeline(

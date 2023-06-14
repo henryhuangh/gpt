@@ -65,18 +65,19 @@ def serve():
 @cross_origin()
 def chat():
     data = request.get_json()
+    if "chat_id" in data:
+        conversation_mem = cache.get(data["chat_id"])
+        chat_id = data["chat_id"]
+    else:
+        conversation_mem = None
+        chat_id = str(uuid.uuid4())
+
+    if conversation_mem is None:
+        conversation_mem = ConversationBufferMemory()
+
     if request.headers.get('accept') == 'text/event-stream':
         from queue import Queue
         q = Queue(1)
-        if "chat_id" in data:
-            conversation_mem = cache.get(data["chat_id"])
-            chat_id = data["chat_id"]
-        else:
-            conversation_mem = None
-            chat_id = str(uuid.uuid4())
-
-        if conversation_mem is None:
-            conversation_mem = ConversationBufferMemory()
 
         class CustomHandler(BaseCallbackHandler):
             def on_llm_new_token(self, token: str, **kwargs) -> None:
@@ -106,23 +107,14 @@ def chat():
                 yield new_text.replace(tokenizer.eos_token, '')
         return Response(stream(), content_type='text/event-stream')
     else:
-        if "chat_id" in data:
-            conversation = cache.get(data["chat_id"])
-            chat_id = data["chat_id"]
-        else:
-            conversation = None
-            chat_id = str(uuid.uuid4())
-
-        if conversation is None:
-            llm = CustomLLM()
-            memory = ConversationBufferMemory()
-            conversation = ConversationChain(
-                llm=llm,
-                memory=memory
-            )
+        llm = CustomLLM()
+        conversation = ConversationChain(
+            llm=llm,
+            memory=conversation_mem
+        )
 
         response = conversation.predict(input=data["response"])
-        cache.set(chat_id, conversation)
+        cache.set(chat_id, conversation.memory)
         return jsonify({"response": response, "chat_id": chat_id})
 
 
@@ -130,8 +122,8 @@ def chat():
 @cross_origin()
 def get_mem():
     data = request.get_json()
-    conversation = cache.get(data["chat_id"])
-    return jsonify(conversation.memory.json())
+    conversation_mem = cache.get(data["chat_id"])
+    return jsonify(conversation_mem.json())
 
 
 if __name__ in "__main__":
